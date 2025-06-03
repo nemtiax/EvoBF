@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Protocol
+from typing import List, Protocol, Sequence
 import random
 
 from executor import execute
@@ -42,7 +42,8 @@ class AdditionTask:
 
 
 def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
-             steps: int = 1000, rng: random.Random | None = None) -> float:
+             steps: int = 1000, rng: random.Random | None = None,
+             inputs: Sequence[List[int]] | None = None) -> float:
     """Evaluate ``program`` on ``instances`` of ``task``.
 
     Parameters
@@ -52,11 +53,15 @@ def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
     task:
         Task providing inputs and computing fitness. Defaults to :class:`AdditionTask`.
     instances:
-        Number of random inputs to evaluate.
+        Number of random inputs to evaluate. Ignored when ``inputs`` is
+        provided.
     steps:
         Maximum instructions to execute for each instance.
     rng:
         Optional random generator.
+    inputs:
+        Optional sequence of pre-generated initial tapes. When provided all
+        programs are evaluated on these inputs instead of generating new ones.
 
     Returns
     -------
@@ -68,12 +73,14 @@ def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
         task = AdditionTask()
 
     rng = rng or random.Random()
-    score = 0.0
 
-    for _ in range(instances):
-        initial = task.generate_input(rng)
+    if inputs is None:
+        inputs = [task.generate_input(rng) for _ in range(instances)]
+
+    score = 0.0
+    for initial in inputs:
         final = execute(program, steps=steps, size=task.size, initial=initial)
-        score += task.fitness(initial, final)
+        score += task.fitness(list(initial), final)
 
     return score
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 from typing import Sequence
 
-from fitness import Task, evaluate
+from fitness import Task, evaluate, AdditionTask
 
 
 INSTRUCTIONS = "><+-.,[]"
@@ -96,14 +96,16 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
     """
 
     rng = rng or random.Random()
+    task = task or AdditionTask()
     population = ["" for _ in range(population_size)]
 
     best_prog = ""
     best_score = float("-inf")
 
     for gen in range(generations):
-        scores = [evaluate(prog, task=task, instances=instances,
-                          steps=steps, rng=rng)
+        eval_inputs = [task.generate_input(rng) for _ in range(instances)]
+        scores = [evaluate(prog, task=task, steps=steps, rng=rng,
+                          inputs=eval_inputs)
                   for prog in population]
         pairs = list(zip(population, scores))
         pairs.sort(key=lambda p: p[1], reverse=True)
@@ -139,8 +141,9 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         population = new_population
 
     # Final evaluation to return accurate best score
-    final_scores = [evaluate(prog, task=task, instances=instances,
-                            steps=steps, rng=rng)
+    final_inputs = [task.generate_input(rng) for _ in range(instances)]
+    final_scores = [evaluate(prog, task=task, steps=steps, rng=rng,
+                            inputs=final_inputs)
                     for prog in population]
     best_idx = max(range(len(population)), key=lambda i: final_scores[i])
     return population[best_idx], final_scores[best_idx]
