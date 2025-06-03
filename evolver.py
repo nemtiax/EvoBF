@@ -61,7 +61,7 @@ def _select(population: Sequence[str], fitnesses: Sequence[float], rng: random.R
 
 def evolve(population_size: int, elite_count: int, generations: int, *,
            mutation_rate: float = 0.1, crossover_rate: float = 0.5,
-           task: Task | None = None, instances: int = 10,
+           task: Task | None = None, instances: int = 10, steps: int = 1000,
            rng: random.Random | None = None, verbose: int = 0) -> tuple[str, float]:
     """Evolve a BrainFuck program.
 
@@ -81,6 +81,8 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         Evaluation task used for fitness calculation.
     instances:
         Number of task instances used per evaluation.
+    steps:
+        Maximum instructions to execute per evaluation.
     rng:
         Optional random generator.
     verbose:
@@ -100,7 +102,8 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
     best_score = float("-inf")
 
     for gen in range(generations):
-        scores = [evaluate(prog, task=task, instances=instances, rng=rng)
+        scores = [evaluate(prog, task=task, instances=instances,
+                          steps=steps, rng=rng)
                   for prog in population]
         pairs = list(zip(population, scores))
         pairs.sort(key=lambda p: p[1], reverse=True)
@@ -136,7 +139,8 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         population = new_population
 
     # Final evaluation to return accurate best score
-    final_scores = [evaluate(prog, task=task, instances=instances, rng=rng)
+    final_scores = [evaluate(prog, task=task, instances=instances,
+                            steps=steps, rng=rng)
                     for prog in population]
     best_idx = max(range(len(population)), key=lambda i: final_scores[i])
     return population[best_idx], final_scores[best_idx]
