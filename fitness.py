@@ -17,8 +17,8 @@ class Task(Protocol):
     def generate_input(self, rng: random.Random) -> List[int]:
         """Return a list of initial cell values for one instance."""
 
-    def check_output(self, initial: List[int], final: List[int]) -> bool:
-        """Return ``True`` if ``final`` is a correct result for ``initial``."""
+    def fitness(self, initial: List[int], final: List[int]) -> float:
+        """Return a fitness value for ``final`` given ``initial``."""
 
 
 @dataclass
@@ -35,12 +35,14 @@ class AdditionTask:
         tape = [a, b] + [0] * (self.size - 2)
         return tape
 
-    def check_output(self, initial: List[int], final: List[int]) -> bool:
-        return final[0] == initial[0] + initial[1]
+    def fitness(self, initial: List[int], final: List[int]) -> float:
+        expected = initial[0] + initial[1]
+        error = abs(final[0] - expected)
+        return -float(error)
 
 
 def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
-             steps: int = 100, rng: random.Random | None = None) -> int:
+             steps: int = 100, rng: random.Random | None = None) -> float:
     """Evaluate ``program`` on ``instances`` of ``task``.
 
     Parameters
@@ -48,7 +50,7 @@ def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
     program:
         BrainFuck program to execute.
     task:
-        Task providing inputs and checking results. Defaults to :class:`AdditionTask`.
+        Task providing inputs and computing fitness. Defaults to :class:`AdditionTask`.
     instances:
         Number of random inputs to evaluate.
     steps:
@@ -58,21 +60,20 @@ def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
 
     Returns
     -------
-    int
-        The number of instances for which the program produced a correct result.
+    float
+        The summed fitness over all instances. Higher values are better.
     """
 
     if task is None:
         task = AdditionTask()
 
     rng = rng or random.Random()
-    score = 0
+    score = 0.0
 
     for _ in range(instances):
         initial = task.generate_input(rng)
         final = execute(program, steps=steps, size=task.size, initial=initial)
-        if task.check_output(initial, final):
-            score += 1
+        score += task.fitness(initial, final)
 
     return score
 

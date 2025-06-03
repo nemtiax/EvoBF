@@ -50,7 +50,7 @@ def main() -> None:
     )
 
     print(program)
-    print(f"Score: {score}/{args.instances}")
+    print(f"Score: {score:.2f}")
 
 
 if __name__ == "__main__":

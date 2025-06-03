@@ -19,8 +19,9 @@ Fitness Evaluation
 The ``evaluate`` function in ``fitness.py`` executes a BrainFuck program on a
 number of randomly generated task instances. By default it uses
 ``AdditionTask`` which places two inputs on the tape and expects their sum in
-the first cell when the program halts. The returned score is the count of
-instances solved correctly.
+the first cell when the program halts. The returned score sums the negative
+absolute difference between the expected and produced value for each
+instance, so perfect solutions achieve the highest (least negative) score.
 
 Verbosity
 ---------
