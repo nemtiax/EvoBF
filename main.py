@@ -27,6 +27,8 @@ def main() -> None:
                         help="maximum random input value for the addition task")
     parser.add_argument("--seed", type=int, default=None,
                         help="random seed")
+    parser.add_argument("-v", "--verbose", action="count", default=0,
+                        help="increase verbosity; can be specified multiple times")
 
     args = parser.parse_args()
 
@@ -44,6 +46,7 @@ def main() -> None:
         task=task,
         instances=args.instances,
         rng=rng,
+        verbose=args.verbose,
     )
 
     print(program)
