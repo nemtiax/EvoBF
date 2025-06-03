@@ -41,8 +41,19 @@ def _crossover(a: str, b: str, rng: random.Random) -> str:
     return a[:cut_a] + b[cut_b:]
 
 
-def _select(population: Sequence[str], weights: Sequence[float], rng: random.Random) -> str:
-    """Fitness-proportional random selection."""
+def _select(population: Sequence[str], fitnesses: Sequence[float], rng: random.Random) -> str:
+    """Fitness-proportional random selection.
+
+    ``fitnesses`` may contain negative values. They are shifted so that the
+    lowest fitness corresponds to weight ``0``.
+    """
+    if not fitnesses:
+        return rng.choice(population)
+    min_fit = min(fitnesses)
+    if min_fit < 0:
+        weights = [f - min_fit for f in fitnesses]
+    else:
+        weights = list(fitnesses)
     if sum(weights) == 0:
         return rng.choice(population)
     return rng.choices(population, weights=weights, k=1)[0]
@@ -51,7 +62,7 @@ def _select(population: Sequence[str], weights: Sequence[float], rng: random.Ran
 def evolve(population_size: int, elite_count: int, generations: int, *,
            mutation_rate: float = 0.1, crossover_rate: float = 0.5,
            task: Task | None = None, instances: int = 10,
-           rng: random.Random | None = None, verbose: int = 0) -> tuple[str, int]:
+           rng: random.Random | None = None, verbose: int = 0) -> tuple[str, float]:
     """Evolve a BrainFuck program.
 
     Parameters
@@ -78,7 +89,7 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
 
     Returns
     -------
-    tuple[str, int]
+    tuple[str, float]
         The best program found and its score on the final generation.
     """
 
@@ -86,7 +97,7 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
     population = ["" for _ in range(population_size)]
 
     best_prog = ""
-    best_score = -1
+    best_score = float("-inf")
 
     for gen in range(generations):
         scores = [evaluate(prog, task=task, instances=instances, rng=rng)
@@ -108,16 +119,16 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
                 print(f"  Best program: {population[0]!r}")
 
         elites = population[:elite_count]
-        weights = scores
+        fitnesses = scores
 
         new_population = elites.copy()
         while len(new_population) < population_size:
             if rng.random() < crossover_rate:
-                parent1 = _select(population, weights, rng)
-                parent2 = _select(population, weights, rng)
+                parent1 = _select(population, fitnesses, rng)
+                parent2 = _select(population, fitnesses, rng)
                 child = _crossover(parent1, parent2, rng)
             else:
-                parent = _select(population, weights, rng)
+                parent = _select(population, fitnesses, rng)
                 child = parent
             child = _mutate(child, rng, mutation_rate)
             new_population.append(child)
