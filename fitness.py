@@ -42,7 +42,7 @@ class AdditionTask:
 
 
 def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
-             steps: int = 100, rng: random.Random | None = None) -> float:
+             steps: int = 1000, rng: random.Random | None = None) -> float:
     """Evaluate ``program`` on ``instances`` of ``task``.
 
     Parameters

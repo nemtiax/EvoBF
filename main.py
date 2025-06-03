@@ -27,6 +27,8 @@ def main() -> None:
                         help="maximum random input value for the addition task")
     parser.add_argument("--seed", type=int, default=None,
                         help="random seed")
+    parser.add_argument("--steps", type=int, default=1000,
+                        help="maximum instructions executed per evaluation")
     parser.add_argument("-v", "--verbose", action="count", default=0,
                         help="increase verbosity; can be specified multiple times")
 
@@ -45,6 +47,7 @@ def main() -> None:
         crossover_rate=args.crossover_rate,
         task=task,
         instances=args.instances,
+        steps=args.steps,
         rng=rng,
         verbose=args.verbose,
     )
