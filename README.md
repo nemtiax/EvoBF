@@ -19,9 +19,10 @@ Fitness Evaluation
 The ``evaluate`` function in ``fitness.py`` executes a BrainFuck program on a
 number of randomly generated task instances. By default it uses
 ``AdditionTask`` which places two inputs on the tape and expects their sum in
-the first cell when the program halts. The returned score sums the negative
-absolute difference between the expected and produced value for each
-instance, so perfect solutions achieve the highest (least negative) score.
+the first cell when the program halts. The inputs are sampled from
+non-negative values only. The returned score sums the negative absolute
+difference between the expected and produced value for each instance, so
+perfect solutions achieve the highest (least negative) score.
 
 The ``--steps`` command line option controls how many instructions a program
 may execute when being evaluated. It defaults to ``1000``.

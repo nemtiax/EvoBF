@@ -30,8 +30,12 @@ class AdditionTask:
     max_value: int = 63
 
     def generate_input(self, rng: random.Random) -> List[int]:
-        a = rng.randint(self.min_value, self.max_value)
-        b = rng.randint(self.min_value, self.max_value)
+        """Return a tape where both inputs are positive."""
+
+        low = max(0, self.min_value)
+        high = max(low, self.max_value)
+        a = rng.randint(low, high)
+        b = rng.randint(low, high)
         tape = [a, b] + [0] * (self.size - 2)
         return tape
 
