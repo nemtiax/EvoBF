@@ -13,3 +13,11 @@ Character	Instruction Performed
 We add one additional twist on the standard language - a [ or ] which is unmatched will be ignored. This allows all strings of these characters to correspond to a valid program.
 
 A program operates on a cyclic tape (moving off one end moves back to the other end) of signed bytes. Our executor should take as input a size indicating how many cells are on the tape, and optionally a list of initial values. If the list is shorter than the specified size, the remaining cells start as zero.
+
+Fitness Evaluation
+------------------
+The ``evaluate`` function in ``fitness.py`` executes a BrainFuck program on a
+number of randomly generated task instances. By default it uses
+``AdditionTask`` which places two inputs on the tape and expects their sum in
+the first cell when the program halts. The returned score is the count of
+instances solved correctly.
