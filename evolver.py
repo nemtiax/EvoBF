@@ -51,7 +51,7 @@ def _select(population: Sequence[str], weights: Sequence[float], rng: random.Ran
 def evolve(population_size: int, elite_count: int, generations: int, *,
            mutation_rate: float = 0.1, crossover_rate: float = 0.5,
            task: Task | None = None, instances: int = 10,
-           rng: random.Random | None = None) -> tuple[str, int]:
+           rng: random.Random | None = None, verbose: int = 0) -> tuple[str, int]:
     """Evolve a BrainFuck program.
 
     Parameters
@@ -72,6 +72,9 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         Number of task instances used per evaluation.
     rng:
         Optional random generator.
+    verbose:
+        Verbosity level. ``0`` disables progress output. Higher values print
+        additional statistics during evolution.
 
     Returns
     -------
@@ -85,7 +88,7 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
     best_prog = ""
     best_score = -1
 
-    for _ in range(generations):
+    for gen in range(generations):
         scores = [evaluate(prog, task=task, instances=instances, rng=rng)
                   for prog in population]
         pairs = list(zip(population, scores))
@@ -96,6 +99,13 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         if scores[0] > best_score:
             best_prog = population[0]
             best_score = scores[0]
+
+        if verbose:
+            avg = sum(scores) / len(scores)
+            msg = f"Gen {gen + 1}/{generations}: best={scores[0]} avg={avg:.2f}"
+            print(msg)
+            if verbose > 1:
+                print(f"  Best program: {population[0]!r}")
 
         elites = population[:elite_count]
         weights = scores

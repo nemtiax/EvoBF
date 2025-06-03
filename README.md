@@ -21,3 +21,9 @@ number of randomly generated task instances. By default it uses
 ``AdditionTask`` which places two inputs on the tape and expects their sum in
 the first cell when the program halts. The returned score is the count of
 instances solved correctly.
+
+Verbosity
+---------
+Use the ``-v``/``--verbose`` flag to display progress during evolution.
+Passing ``-v`` prints the best and average score for each generation. Using
+``-vv`` additionally prints the current best program.
