@@ -22,6 +22,10 @@ non-negative values only. The returned score sums the negative absolute
 difference between the expected and produced value for each instance, so
 perfect solutions achieve the highest (least negative) score.
 
+``TripleAdditionTask`` extends this idea by placing three inputs on the tape
+and expecting their sum in the first cell. The default bounds ensure that the
+sum never exceeds the signed byte range.
+
 The ``--steps`` command line option controls how many instructions a program
 may execute when being evaluated. It defaults to ``1000``.
 
