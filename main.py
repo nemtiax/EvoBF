@@ -19,6 +19,8 @@ def main() -> None:
                         help="probability of creating offspring via crossover")
     parser.add_argument("--instances", type=int, default=10,
                         help="number of evaluation instances per program")
+    parser.add_argument("--init-length", type=int, default=10,
+                        help="initial random program length")
     parser.add_argument("--task", choices=["addition", "triple"], default="addition",
                         help="evaluation task to use")
     parser.add_argument("--size", type=int, default=8,
@@ -56,6 +58,7 @@ def main() -> None:
         task=task,
         instances=args.instances,
         steps=args.steps,
+        init_length=args.init_length,
         rng=rng,
         verbose=args.verbose,
     )

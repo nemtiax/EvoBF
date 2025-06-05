@@ -26,6 +26,13 @@ perfect solutions achieve the highest (least negative) score.
 and expecting their sum in the first cell. The default bounds ensure that the
 sum never exceeds the signed byte range.
 
+Initialization
+--------------
+The population can optionally start with random programs rather than empty
+strings. Use the ``--init-length`` option to specify how many instructions the
+initial programs contain. This helps the search discover useful building blocks
+more quickly.
+
 The ``--steps`` command line option controls how many instructions a program
 may execute when being evaluated. It defaults to ``1000``.
 
