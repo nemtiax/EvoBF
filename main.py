@@ -2,7 +2,7 @@ import argparse
 import random
 
 from evolver import evolve
-from fitness import AdditionTask
+from fitness import AdditionTask, TripleAdditionTask
 
 
 def main() -> None:
@@ -19,6 +19,8 @@ def main() -> None:
                         help="probability of creating offspring via crossover")
     parser.add_argument("--instances", type=int, default=10,
                         help="number of evaluation instances per program")
+    parser.add_argument("--task", choices=["addition", "triple"], default="addition",
+                        help="evaluation task to use")
     parser.add_argument("--size", type=int, default=8,
                         help="tape size for the addition task")
     parser.add_argument("--min-value", type=int, default=-64,
@@ -35,9 +37,15 @@ def main() -> None:
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
-    task = AdditionTask(size=args.size,
-                        min_value=args.min_value,
-                        max_value=args.max_value)
+
+    if args.task == "addition":
+        task = AdditionTask(size=args.size,
+                            min_value=args.min_value,
+                            max_value=args.max_value)
+    else:
+        task = TripleAdditionTask(size=args.size,
+                                  min_value=args.min_value,
+                                  max_value=args.max_value)
 
     program, score = evolve(
         args.population_size,
