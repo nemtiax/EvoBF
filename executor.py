@@ -31,14 +31,13 @@ def _build_bracket_map(program: str) -> Mapping[int, int]:
     return pairs
 
 
-def execute(program: str, *, steps: int, size: int, initial: Iterable[int] | None = None,
-            input_data: Iterable[int] | None = None) -> List[int]:
+def execute(program: str, *, steps: int, size: int, initial: Iterable[int] | None = None) -> List[int]:
     """Execute ``program`` for up to ``steps`` instructions.
 
     Parameters
     ----------
     program:
-        BrainFuck program consisting of the characters ``><+-.,[]``. Any other
+        BrainFuck program consisting of the characters ``><+-[]``. Any other
         characters are ignored.
     steps:
         Maximum number of instructions to execute.
@@ -47,9 +46,6 @@ def execute(program: str, *, steps: int, size: int, initial: Iterable[int] | Non
     initial:
         Optional iterable of initial cell values. If fewer than ``size`` values
         are provided, remaining cells start at ``0``.
-    input_data:
-        Optional iterable of input values consumed by ```,` commands. Missing
-        input results in storing ``0``.
 
     Returns
     -------
@@ -70,7 +66,6 @@ def execute(program: str, *, steps: int, size: int, initial: Iterable[int] | Non
 
     data_ptr = 0
     instr_ptr = 0
-    input_iter = iter(input_data or [])
 
     executed = 0
     prog_len = len(program)
@@ -85,13 +80,6 @@ def execute(program: str, *, steps: int, size: int, initial: Iterable[int] | Non
             tape[data_ptr] = _wrap_byte(tape[data_ptr] + 1)
         elif command == '-':
             tape[data_ptr] = _wrap_byte(tape[data_ptr] - 1)
-        elif command == '.':
-            pass  # Output is ignored
-        elif command == ',':
-            try:
-                tape[data_ptr] = _wrap_byte(next(input_iter))
-            except StopIteration:
-                tape[data_ptr] = 0
         elif command == '[':
             if tape[data_ptr] == 0:
                 match = bracket_map.get(instr_ptr)
