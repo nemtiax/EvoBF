@@ -8,7 +8,7 @@ from typing import Sequence
 from fitness import Task, evaluate, AdditionTask
 
 
-INSTRUCTIONS = "><+-.,[]"
+INSTRUCTIONS = "><+-[]"
 
 
 def _mutate(program: str, rng: random.Random, rate: float) -> str:
