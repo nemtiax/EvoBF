@@ -11,6 +11,17 @@ from fitness import Task, evaluate, AdditionTask
 INSTRUCTIONS = "><+-[]"
 
 
+def _random_program(rng: random.Random, length: int) -> str:
+    """Return a random program of ``length`` instructions."""
+    chars: list[str] = []
+    for _ in range(length):
+        if rng.random() < 0.1:
+            chars.extend(["[", "]"])
+        else:
+            chars.append(rng.choice(INSTRUCTIONS))
+    return "".join(chars)
+
+
 def _mutate(program: str, rng: random.Random, rate: float) -> str:
     """Return a mutated copy of ``program``."""
     chars = list(program)
@@ -24,11 +35,19 @@ def _mutate(program: str, rng: random.Random, rate: float) -> str:
                 chars.pop(i)
                 continue
             else:  # ins
-                chars.insert(i, rng.choice(INSTRUCTIONS))
-                i += 1
+                if rng.random() < 0.1:
+                    chars.insert(i, '[')
+                    chars.insert(i + 1, ']')
+                    i += 2
+                else:
+                    chars.insert(i, rng.choice(INSTRUCTIONS))
+                    i += 1
         i += 1
     if rng.random() < rate:
-        chars.append(rng.choice(INSTRUCTIONS))
+        if rng.random() < 0.1:
+            chars.extend(['[', ']'])
+        else:
+            chars.append(rng.choice(INSTRUCTIONS))
     return "".join(chars)
 
 
@@ -62,6 +81,7 @@ def _select(population: Sequence[str], fitnesses: Sequence[float], rng: random.R
 def evolve(population_size: int, elite_count: int, generations: int, *,
            mutation_rate: float = 0.1, crossover_rate: float = 0.5,
            task: Task | None = None, instances: int = 10, steps: int = 1000,
+           init_length: int = 0,
            rng: random.Random | None = None, verbose: int = 0) -> tuple[str, float]:
     """Evolve a BrainFuck program.
 
@@ -83,6 +103,9 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
         Number of task instances used per evaluation.
     steps:
         Maximum instructions to execute per evaluation.
+    init_length:
+        If greater than ``0``, population individuals start as random programs
+        of this length instead of empty strings.
     rng:
         Optional random generator.
     verbose:
@@ -97,7 +120,10 @@ def evolve(population_size: int, elite_count: int, generations: int, *,
 
     rng = rng or random.Random()
     task = task or AdditionTask()
-    population = ["" for _ in range(population_size)]
+    if init_length > 0:
+        population = [_random_program(rng, init_length) for _ in range(population_size)]
+    else:
+        population = ["" for _ in range(population_size)]
 
     best_prog = ""
     best_score = float("-inf")
