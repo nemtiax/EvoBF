@@ -45,6 +45,33 @@ class AdditionTask:
         return -float(error)
 
 
+@dataclass
+class TripleAdditionTask:
+    """Task: sum the first three cells without overflow."""
+
+    size: int = 8
+    min_value: int = -42
+    max_value: int = 42
+
+    def generate_input(self, rng: random.Random) -> List[int]:
+        """Return a tape with three positive inputs.
+
+        The range is restricted so that the sum fits into a signed byte.
+        """
+        low = max(0, self.min_value)
+        high = max(low, self.max_value)
+        a = rng.randint(low, high)
+        b = rng.randint(low, high)
+        c = rng.randint(low, high)
+        tape = [a, b, c] + [0] * (self.size - 3)
+        return tape
+
+    def fitness(self, initial: List[int], final: List[int]) -> float:
+        expected = initial[0] + initial[1] + initial[2]
+        error = abs(final[0] - expected)
+        return -float(error)
+
+
 def evaluate(program: str, *, task: Task | None = None, instances: int = 1,
              steps: int = 1000, rng: random.Random | None = None,
              inputs: Sequence[List[int]] | None = None) -> float:
